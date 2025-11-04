@@ -6,6 +6,7 @@ pipeline {
             steps {
                 echo '✅ Checking out code from GitHub...'
                 checkout scm
+                sh 'ls -la'   // 👈 This will confirm package.json exists
             }
         }
 
@@ -13,7 +14,10 @@ pipeline {
             steps {
                 echo '🛠️ Installing dependencies using Node.js...'
                 sh '''
-                    docker run --rm -v "$PWD":/app -w /app node:18 npm install
+                    echo "📁 Current directory contents:"
+                    ls -la
+                    echo "🧱 Running npm install..."
+                    docker run --rm -v "$(pwd)":/app -w /app node:18 npm install
                 '''
             }
         }
@@ -21,9 +25,7 @@ pipeline {
         stage('Deploy (Simulated)') {
             steps {
                 echo '🚀 Simulating deployment...'
-                sh '''
-                    bash restart_app.sh
-                '''
+                sh 'bash restart_app.sh'
             }
         }
     }
