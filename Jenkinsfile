@@ -5,29 +5,23 @@ pipeline {
         WORKSPACE_PATH = "${env.WORKSPACE}"
     }
 
-    stages {
-        stage('Checkout Code') {
-            steps {
-                echo '✅ Checking out code from GitHub...'
-                checkout scm
-                sh 'ls -la'
-            }
+stage('Build App') {
+    agent {
+        docker {
+            image 'node:18'
+            args '-v $PWD:/app -w /app'
         }
+    }
+    steps {
+        sh '''
+            echo "📁 Current directory contents:"
+            ls -la
+            echo "🧱 Running npm install..."
+            npm install
+        '''
+    }
+}
 
-        stage('Build App') {
-            steps {
-                echo '🛠️ Installing dependencies using Node.js...'
-                sh '''
-                    echo "📁 Current directory contents:"
-                    ls -la
-                    echo "🧱 Running npm install..."
-                    docker run --rm \
-                        -v ${WORKSPACE_PATH}:/app \
-                        -w /app node:18 \
-                        bash -c "ls -la && npm install"
-                '''
-            }
-        }
 
         stage('Deploy (Simulated)') {
             steps {
