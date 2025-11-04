@@ -1,12 +1,16 @@
 pipeline {
     agent any
 
+    environment {
+        WORKSPACE_PATH = "${env.WORKSPACE}"
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
                 echo '✅ Checking out code from GitHub...'
                 checkout scm
-                sh 'ls -la'   // 👈 This will confirm package.json exists
+                sh 'ls -la'
             }
         }
 
@@ -17,7 +21,10 @@ pipeline {
                     echo "📁 Current directory contents:"
                     ls -la
                     echo "🧱 Running npm install..."
-                    docker run --rm -v "$(pwd)":/app -w /app node:18 npm install
+                    docker run --rm \
+                        -v ${WORKSPACE_PATH}:/app \
+                        -w /app node:18 \
+                        bash -c "ls -la && npm install"
                 '''
             }
         }
