@@ -12,14 +12,22 @@ pipeline {
         stage('Build App') {
             steps {
                 echo '🛠️ Installing dependencies using Node.js...'
-                sh 'docker run --rm -v $PWD:/app -w /app node:18 npm install'
+                // Adjust working directory to your repo folder
+                sh '''
+                    REPO_DIR=$(ls | grep jenkins-pipeline-demo)
+                    docker run --rm -v "$PWD":/app -w /app/$REPO_DIR node:18 npm install
+                '''
             }
         }
 
         stage('Deploy (Simulated)') {
             steps {
                 echo '🚀 Simulating deployment...'
-                sh 'bash restart_app.sh'
+                sh '''
+                    REPO_DIR=$(ls | grep jenkins-pipeline-demo)
+                    cd $REPO_DIR
+                    bash restart_app.sh
+                '''
             }
         }
     }
